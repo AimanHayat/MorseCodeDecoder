@@ -1,0 +1,179 @@
+using System;
+
+class MorseCodeDecoder
+{
+    enum State
+    {
+        START,
+        ERROR,
+        // Morse Code characters
+        E, T,
+        I, A, N, M,
+        S, U, R, W, D, K, G, O,
+        H, V, F, L, P, J, B, X, C, Y, Z, Q
+    }
+
+    static char DecodeCharacter(State state)
+    {
+        switch (state)
+        {
+            case State.A: return 'A';
+            case State.B: return 'B';
+            case State.C: return 'C';
+            case State.D: return 'D';
+            case State.E: return 'E';
+            case State.F: return 'F';
+            case State.G: return 'G';
+            case State.H: return 'H';
+            case State.I: return 'I';
+            case State.J: return 'J';
+            case State.K: return 'K';
+            case State.L: return 'L';
+            case State.M: return 'M';
+            case State.N: return 'N';
+            case State.O: return 'O';
+            case State.P: return 'P';
+            case State.Q: return 'Q';
+            case State.R: return 'R';
+            case State.S: return 'S';
+            case State.T: return 'T';
+            case State.U: return 'U';
+            case State.V: return 'V';
+            case State.W: return 'W';
+            case State.X: return 'X';
+            case State.Y: return 'Y';
+            case State.Z: return 'Z';
+            default: return '?';
+        }
+    }
+
+    static State GetNextState(State currentState, char morseChar)
+    {
+        switch (currentState)
+        {
+            case State.START:
+                if (morseChar == '.') return State.E;
+                if (morseChar == '-') return State.T;
+                break;
+            case State.E:
+                if (morseChar == '.') return State.I;
+                if (morseChar == '-') return State.A;
+                break;
+            case State.T:
+                if (morseChar == '.') return State.N;
+                if (morseChar == '-') return State.M;
+                break;
+            case State.I:
+                if (morseChar == '.') return State.S;
+                if (morseChar == '-') return State.U;
+                break;
+            case State.A:
+                if (morseChar == '.') return State.R;
+                if (morseChar == '-') return State.W;
+                break;
+            case State.N:
+                if (morseChar == '.') return State.D;
+                if (morseChar == '-') return State.K;
+                break;
+            case State.M:
+                if (morseChar == '.') return State.G;
+                if (morseChar == '-') return State.O;
+                break;
+            case State.S:
+                if (morseChar == '.') return State.H;
+                if (morseChar == '-') return State.V;
+                break;
+            case State.U:
+                if (morseChar == '.') return State.F;
+                break;
+            case State.R:
+                if (morseChar == '.') return State.L;
+                break;
+            case State.W:
+                if (morseChar == '.') return State.P;
+                if (morseChar == '-') return State.J;
+                break;
+            case State.D:
+                if (morseChar == '.') return State.B;
+                if (morseChar == '-') return State.X;
+                break;
+            case State.K:
+                if (morseChar == '.') return State.C;
+                if (morseChar == '-') return State.Y;
+                break;
+            case State.G:
+                if (morseChar == '.') return State.Z;
+                if (morseChar == '-') return State.Q;
+                break;
+            // The states for letters with three or four Morse code characters are final states
+            // Any additional dot or dash should return an error or remain in the same state
+            case State.H:
+            case State.V:
+            case State.F:
+            case State.L:
+            case State.P:
+            case State.J:
+            case State.B:
+            case State.X:
+            case State.C:
+            case State.Y:
+            case State.Z:
+            case State.Q:
+                return State.ERROR;
+            default:
+                return State.ERROR;
+        }
+        return State.ERROR;
+    }
+
+    static string MorseAutomata(string morseLine)
+    {
+        string[] words = morseLine.Split('/');
+        string code = "";
+        State state = State.START;
+
+        foreach (string word in words)
+        {
+            string[] letters = word.Split(' ');
+
+            foreach (string letter in letters)
+            {
+                state = State.START;
+                foreach (char morseChar in letter)
+                {
+                    Console.WriteLine($"Current state: {state}, Processing Morse character: {morseChar}");
+                    state = GetNextState(state, morseChar);
+                    Console.WriteLine($"New state: {state}");
+                    if (state == State.ERROR)
+                    {
+                        Console.WriteLine("Error encountered.");
+                        break;
+                    }
+                }
+
+                if (state != State.ERROR && state != State.START)
+                {
+                    code += DecodeCharacter(state);
+                }
+                else
+                {
+                    code += '?'; // Unrecognized sequence
+                }
+            }
+
+            code += " ";
+        }
+
+        return code.Trim();
+    }
+
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Type your morse code here: ");
+
+        string morseLine = Console.ReadLine();
+        string decodedText = MorseAutomata(morseLine);
+
+        Console.WriteLine("Output: " + decodedText);
+    }
+}
